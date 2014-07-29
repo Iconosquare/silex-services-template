@@ -24,3 +24,8 @@ $app['mysql_password'] = '***';
 $app['memcache_servers'] = array(
     array("host" => "***", "port" => 0000)
 );
+
+// Redis
+$app['redis.servers'] = array(
+    array('host' => '127.0.0.1', 'port' => '6379', 'timeout' => 0.1, 'alias' => 'master', 'isMaster' => true)
+);

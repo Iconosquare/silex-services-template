@@ -1,7 +1,9 @@
 {
     "require": {
         "silex/silex": "~1.2",
-        "silex/web-profiler": "~1.0"
+        "silex/web-profiler": "~1.0",
+        "tripnity/silex-memcache": "dev-master",
+        "tripnity/silex-redis": "dev-master"
     },
     "require-dev": {
         "atoum/atoum": "dev-master"
