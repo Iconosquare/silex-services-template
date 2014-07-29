@@ -13,6 +13,3 @@ $ cp app/config/config_default.php app/config/config.php
 # Changements des droits sur les fichiers cache et log
 $ chmod -R 777 app/log
 $ chmod -R 777 app/cache
-$ chmod -R 777 web/concours-tmp
-
-Les bundles sont crées dans Gruntfile.js.
