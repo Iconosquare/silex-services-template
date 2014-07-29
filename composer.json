@@ -1,0 +1,26 @@
+{
+    "require": {
+        "silex/silex": "~1.2",
+        "silex/web-profiler": "~1.0"
+    },
+    "require-dev": {
+        "atoum/atoum": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Iconosquare": "src/" }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/Tripnity/Instagram-PHP-API.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Tripnity/silex-memcache.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/Tripnity/silex-redis.git"
+        }
+    ]
+}
