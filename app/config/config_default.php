@@ -2,7 +2,7 @@
 
 $app['debug'] = false;
 $app['profiler'] = false;
-$app['iconosquare_url'] = 'http://iconosqua.re/';
+$app['iconosquare_url'] = 'http://iconosquare.com/';
 
 // Directories
 $app['dir'] = array(
