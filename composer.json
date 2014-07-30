@@ -11,6 +11,12 @@
     "autoload": {
         "psr-0": { "Iconosquare": "src/" }
     },
+     "require-dev": {
+        "phpdocumentor/phpdocumentor": "2.*"
+    },
+    "require-dev": {
+        "sebastian/phpcpd": "*"
+    },
     "repositories": [
         {
             "type": "vcs",
