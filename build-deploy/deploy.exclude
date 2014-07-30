@@ -1,0 +1,10 @@
+.htaccess
+.git
+.DS_Store
+.buildpath
+.gitignore
+.project
+.settings
+build
+build-deploy
+.templates

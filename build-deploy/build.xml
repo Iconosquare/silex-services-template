@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="Silex-template" default="help" basedir="../">
+	<property file="${basedir}/build-deploy/deploy.properties" />
+	<property name="env" value="local"/>
+	<property name="doc-root" value="${basedir}/src/Iconosquare"/>
+
+	<target name="help" description="Display detailed usage information">
+		<echo>Type "ant -p" to see a list of targets</echo>
+	</target>
+
+	<target name="build" depends="composer:update, configure:validate, setup" description="Common short build, without source checking" />
+	<target name="build:full" depends="composer:update, configure, configure:validate, setup, verify" />
+	<target name="build:install" description="Full build with dependency refresh." depends="composer:install, build:full" />
+
+	<target name="clean" description="Cleanup build artifacts">
+		<delete dir="${basedir}/build/coverage" />
+		<delete dir="${basedir}/build/logs" />
+		<delete dir="${basedir}/build/docs" />
+		<delete dir="${basedir}/app/log" />
+		<delete dir="${basedir}/app/cache" />	
+	</target>
+
+	<target name="clean:reset" depends="clean" description="Cleanup build artifacts, composer lock file and libraries">
+		<delete dir="${basedir}/build/coverage" />
+		<delete file="${basedir}/composer.lock" />
+		<delete dir="${basedir}/vendor" />
+	    <delete dir="${basedir}/app/log" />
+		<delete dir="${basedir}/app/cache" />	
+	</target>
+
+	<target name="deploy" depends="-git-checkout, configure" description="Deploys a specific branch or tag via rsync">
+		<fail unless="rsync.user" message="'rsync.user' variable not set. Please specificy with -Drsync.user=&lt;USER&gt; or add it to deploy.properties" />
+		<fail unless="rsync.host" message="'rsync.host' variable not set. Please specificy with -Drsync.host=&lt;HOST&gt; or add it to deploy.properties" />
+		<fail unless="rsync.user" message="'rsync.dest' variable not set. Please specificy with -Drsync.dest=&lt;DEST&gt; or add it to deploy.properties" />
+		<echo>sync from ${basedir} to ${rsync.user}@${rsync.host}:${rsync.dest}</echo>
+		<exec executable="rsync" failonerror="true">
+			<arg value="--verbose" />
+			<arg value="-rclgz" />
+			<arg value="--delete" />
+			<arg value="--exclude-from=${basedir}/build-deploy/deploy.exclude" />
+			<arg value="${basedir}/" />
+			<arg value="${rsync.user}@${rsync.host}:${rsync.dest}" />
+		</exec>
+	</target>
+
+	<target name="setup" depends="clean" description="Prepare for build">
+		<mkdir dir="${basedir}/build/coverage" />
+		<mkdir dir="${basedir}/build/logs" />
+		<mkdir dir="${basedir}/build/docs" />
+		<mkdir dir="${basedir}/app/log" />
+		<mkdir dir="${basedir}/app/cache" />
+		<chmod file="${basedir}/app/log/*" perm="777" type="both"/>
+		<chmod file="${basedir}/app/cache/*" perm="777" type="both"/>	
+	</target>
+
+	<target name="configure" depends="configure-template:validate" description="Configure application.">
+		<fail unless="env" message="'env' variable not set. Please specificy with -Denv=&lt;ENV&gt; or add to build.properties" />
+		<copy file="${basedir}/build-deploy/config-templates/${env}_config.php" tofile="${basedir}/app/config/config.php" overwrite="true" />
+	</target>
+
+	<target name="configure:remove" description="Removes configurations.">
+		<delete dir="${basedir}/app/config" />
+	</target>
+
+	<target name="configure:validate" description="Validates already used configuration files">
+		<echo message="Validating configuration files ..."/>
+        <echo message=" - method not fully implemented!"/>
+	</target>
+
+	<target name="configure-template:validate" description="Validates configuration templates">
+		<echo message=" - method not implemented yet, but SHOULD BE!"/>
+	</target>
+
+	<target name="phpcpd" description="Find duplicate code using PHPCPD">
+		<exec executable="${basedir}/vendor/sebastian/phpcpd/phpcpd" dir="${basedir}">
+			<arg value="--log-pmd" />
+			<arg value="${basedir}/build/logs/pmd-cpd.xml" />
+			<arg path="${basedir}/src"/>
+		</exec>
+	</target>
+
+	<target name="verify" depends="verify:php, verify:js" description="Vérifier les erreurs de syntaxe PHP et Javascript" />
+
+	<target name="verify:js" description="Vérifier les erreurs de syntaxe Javascript">
+		<apply executable="jshint" failonerror="true">
+			<arg value="--config" />
+			<arg path="${basedir}/.git/hooks/jshint-config.json" /> 
+			<fileset dir="${basedir}/" excludes="lib/, vendor/">
+				<include name="**/*.js" />
+			</fileset>
+		</apply>
+	</target>
+
+	<target name="verify:php" description="Vérifier les erreurs de syntaxe PHP">
+		<apply executable="php" failonerror="true">
+			<arg value="-l" />
+			<fileset dir="${basedir}/" excludes="lib/, vendor/">
+				<include name="**/*.php" />
+			</fileset>
+		</apply>
+	</target>
+
+	<target name="phpdoc" description="Generate App documentation using PHPDocumentor">
+		<exec executable="${basedir}/vendor/phpdocumentor/phpdocumentor/bin/phpdoc" dir="${basedir}">
+			<arg value="-v" />
+			<arg value="-d" />
+			<arg path="${doc-root}" />
+			<arg value="--ignore" />
+			<arg value="register.php" />
+			<arg value="--ignore" />
+			<arg value="config.php" />
+			<arg value="-t" />
+			<arg path="${basedir}/build/docs" />
+			<arg value="--title" />
+			<arg value="Silex template application" />
+		</exec>
+	</target>
+
+	<target name="git-setup" description="Installs and configures pre-commit hook script.">
+		<mkdir dir="${basedir}/tmp" />
+		<exec executable="git" dir="${basedir}/tmp" failonerror="true">
+			<arg value="clone" />
+			<arg value="https://github.com/Tripnity/silex-services-template" />
+			<arg value="." />
+		</exec>
+		<copy file="${basedir}/.templates/pre-commit" tofile="${basedir}/.git/hooks/pre-commit" overwrite="true" />
+		<copy file="${basedir}/.templates/jshint-config.json" tofile="${basedir}/.git/hooks/jshint-config.json" overwrite="true" />
+		<exec executable="chmod" dir="${basedir}/.git/hooks" failonerror="true">
+			<arg value="751" />
+			<arg value="pre-commit" />
+		</exec>
+		<delete dir="${basedir}/tmp" />
+	</target>
+
+	<target name="-git-checkout">
+		<fail unless="git.branch" message="'git.branch' variable not set. Please specificy with -Dgit.branch=&lt;BRANCH&gt; or add to deploy.properties" />
+		<exec executable="git" dir="${basedir}" failonerror="true">
+			<arg value="checkout" />
+			<arg value="${git.branch}" />
+		</exec>
+	</target>
+
+	<target name="composer:update">
+		<exec dir="${basedir}" executable="composer" failonerror="true">
+			<arg value="update" />
+		</exec>
+	</target>
+
+	<target name="composer:install">
+		<delete dir="${basedir}/vendor" />
+		<exec dir="${basedir}" executable="composer" failonerror="true">
+			<arg value="install" />
+		</exec>
+	</target>
+
+</project>
