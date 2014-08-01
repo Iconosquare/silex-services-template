@@ -50,8 +50,9 @@ $ ssh -vT git@github.com
    et enregistrer la partie publique dans ton compte Github -> SSH keys et aprés revérifier.
 
 
-Installation et configuration (environment "local")
-===================================================
+Installation et configuration
+=============================
+   (environment "local")
 ```bash
 $ ant build:full -Denv=local
 ```
