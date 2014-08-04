@@ -54,6 +54,8 @@ Installation et configuration
 =============================
    (environment "local")
 ```bash
+$ cd build-deploy
+$ ant git-setup
 $ ant build:full -Denv=local
 ```
 

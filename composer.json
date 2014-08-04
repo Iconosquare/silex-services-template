@@ -2,6 +2,7 @@
     "require": {
         "silex/silex": "~1.2",
         "silex/web-profiler": "~1.0",
+        "phpdocumentor/phpdocumentor": "dev-master",
         "tripnity/silex-memcache": "dev-master",
         "tripnity/silex-redis": "dev-master"
     },
@@ -10,9 +11,6 @@
     },
     "autoload": {
         "psr-0": { "Iconosquare": "src/" }
-    },
-     "require-dev": {
-        "phpdocumentor/phpdocumentor": "2.*"
     },
     "require-dev": {
         "sebastian/phpcpd": "*"
